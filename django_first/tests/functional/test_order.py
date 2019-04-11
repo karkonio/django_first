@@ -1,6 +1,6 @@
 import pytest
 from django_first.models import\
-    (Product, Store, StoreItem, Order, OrderItem, Customer)
+    (Product, Store, StoreItem, Order, OrderItem, Customer, Payment)
 
 
 @pytest.fixture
@@ -30,13 +30,36 @@ def data():
         product=product,
         quantity=10
     )
-    return product, store, store_item, order, order_item, customer
+    payment = Payment.objects.create(
+        order=order,
+        amount=1000,
+        is_confirmed=True
+    )
+    return product, store, store_item, order, order_item, customer, payment
 
 
 def test_order_process_is_ok(db, data):
-    product, store, store_item, order, order_item, customer = data
+    product, store, store_item, order, order_item, customer, payment = data
     order.process()
     store_item.refresh_from_db()
     assert order.price == 100
     assert order.is_paid is True
     assert store_item.quantity == 90
+
+
+def test_order_process_fail_not_enough_stock(db, data):
+    product, store, store_item, order, order_item, customer, payment = data
+    order_item.quantity = 200
+    order_item.save()
+    with pytest.raises(Exception) as e:
+        order.process()
+    assert str(e.value) == 'Not enough stock'
+
+
+def test_order_process_fail_not_enough_money(db, data):
+    product, store, store_item, order, order_item, customer, payment = data
+    payment.amount = 10
+    payment.save()
+    with pytest.raises(Exception) as e:
+        order.process()
+    assert str(e.value) == 'Not enough money'
