@@ -12,3 +12,15 @@ class Store(models.Model):
     )
     quantity = models.IntegerField()
     location = models.CharField(max_length=100)
+
+
+class StoreItem():
+    pass
+
+
+class Order():
+    pass
+
+
+class OrderItem():
+    pass
