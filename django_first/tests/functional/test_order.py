@@ -18,12 +18,13 @@ def test_order_process_is_ok(db):
     order = Order.objects.create(
         location='Almaty'
     )
-    order_item = OrderItem.objects.create(
+    OrderItem.objects.create(
         order=order,
         product=product,
         quantity=10
     )
     order.process()
+    store_item.refresh_from_db()
     assert order.price == 100
     assert order.is_paid is True
     assert store_item.quantity == 90

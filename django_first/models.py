@@ -33,6 +33,21 @@ class Order(models.Model):
     )
     is_paid = models.BooleanField(default=True)
 
+    def process(self):
+        store = Store.objects.get(location=self.location)
+        for item in self.items.all():
+            store_item = StoreItem.objects.get(
+                store=store,
+                product=item.product
+            )
+            store_item.quantity -= item.quantity
+            store_item.save()
+        self.price = sum(
+            (item.product.price * item.quantity for item in self.items.all())
+        )
+        self.is_paid = True
+        self.save()
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(
