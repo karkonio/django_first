@@ -2,7 +2,7 @@ from django_first.models import\
     (Product, Store, StoreItem, Order, OrderItem)
 
 
-def test_order_process_is_ok():
+def test_order_process_is_ok(db):
     product = Product.objects.create(
         name='apple',
         price=10
@@ -18,7 +18,7 @@ def test_order_process_is_ok():
     order = Order.objects.create(
         location='Almaty'
     )
-    OrderItem.objects.create(
+    order_item = OrderItem.objects.create(
         order=order,
         product=product,
         quantity=10
