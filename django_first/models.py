@@ -9,6 +9,10 @@ class Product(models.Model):
     )
 
 
+class Customer(models.Model):
+    name = models.CharField(max_length=100)
+
+
 class Store(models.Model):
     location = models.CharField(max_length=100)
 
@@ -26,6 +30,11 @@ class StoreItem(models.Model):
 
 
 class Order(models.Model):
+    customer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE,
+        related_name='orders',
+        null=True, blank=True
+    )
     location = models.CharField(max_length=100)
     price = models.DecimalField(
         max_digits=10, decimal_places=2,

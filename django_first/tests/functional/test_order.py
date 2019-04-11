@@ -1,5 +1,5 @@
 from django_first.models import\
-    (Product, Store, StoreItem, Order, OrderItem)
+    (Product, Store, StoreItem, Order, OrderItem, Customer)
 
 
 def test_order_process_is_ok(db):
@@ -7,6 +7,10 @@ def test_order_process_is_ok(db):
         name='apple',
         price=10
     )
+    customer = Customer(
+        name='Kira'
+    )
+    customer.save()
     store = Store.objects.create(
         location='Almaty'
     )
@@ -16,6 +20,7 @@ def test_order_process_is_ok(db):
         quantity=100
     )
     order = Order.objects.create(
+        customer=customer,
         location='Almaty'
     )
     OrderItem.objects.create(
