@@ -1,6 +1,7 @@
 import pytest
 from django_first.models import\
     (Product, Store, StoreItem, Order, OrderItem, Customer, Payment)
+from django_first.exceptions import StoreException, PaymentException
 
 
 @pytest.fixture
@@ -67,7 +68,7 @@ def test_order_process_fail_not_enough_stock(db, data):
     product, store, store_item, order, order_item, customer, payment = data
     order_item.quantity = 200
     order_item.save()
-    with pytest.raises(Exception) as e:
+    with pytest.raises(StoreException) as e:
         order.process()
     assert str(e.value) == 'Not enough stock'
 
@@ -76,7 +77,7 @@ def test_order_process_fail_not_enough_money(db, data):
     product, store, store_item, order, order_item, customer, payment = data
     payment.amount = 10
     payment.save()
-    with pytest.raises(Exception) as e:
+    with pytest.raises(PaymentException) as e:
         order.process()
     assert str(e.value) == 'Not enough money'
 
@@ -85,7 +86,7 @@ def test_order_process_fail_payment_not_confirmed(db, data):
     product, store, store_item, order, order_item, customer, payment = data
     payment.is_confirmed = False
     payment.save()
-    with pytest.raises(Exception) as e:
+    with pytest.raises(PaymentException) as e:
         order.process()
     assert str(e.value) == 'Not enough money'
 
@@ -94,6 +95,6 @@ def test_order_process_fail_location_not_avaliable(db, data):
     product, store, store_item, order, order_item, customer, payment = data
     order.location = 'Astsna'
     order.save()
-    with pytest.raises(Exception) as e:
+    with pytest.raises(StoreException) as e:
         order.process()
     assert str(e.value) == 'Location not avaliable'
