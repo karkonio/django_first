@@ -1,6 +1,6 @@
 import pytest
 
-from django.contrib.models import User
+from django.contrib.auth.models import User
 
 from django_first.models import\
     (Product, Store, StoreItem, Order, OrderItem,
@@ -19,7 +19,7 @@ def data():
         username='kira',
         password='testtest'
     )
-    customer = Customer(name='Kira', user='kira')
+    customer = Customer(name='Kira', user=user)
     customer.save()
     store = Store.objects.create(location=location)
     store_item = StoreItem.objects.create(
@@ -47,6 +47,8 @@ def test_order_process_is_ok(db, data):
     assert order.price == 100
     assert order.is_paid is True
     assert store_item.quantity == 90
+    assert order.customer.name == 'Kira'
+    assert order.customer.user.username == 'kira'
 
 
 def test_order_process_ok_mulitple_payments(db, data):

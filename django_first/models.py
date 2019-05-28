@@ -1,5 +1,5 @@
 from django.db import models
-# from django.contrib.models import User
+from django.contrib.auth.models import User
 
 
 class Product(models.Model):
@@ -23,7 +23,7 @@ class Location(models.Model):
 
 class Customer(models.Model):
     name = models.CharField(max_length=100)
-    # user = models.OnetoOneField(user, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
 class Store(models.Model):
