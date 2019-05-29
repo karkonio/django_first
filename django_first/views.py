@@ -9,3 +9,10 @@ def hello(request):
     return render(request, 'hello.html', context={
         'orders': orders
     })
+
+
+def order(request, order_id):
+    order = Order.objects.get(id=order_id)
+    return render(request, 'order.html', context={
+        'order': order
+    })

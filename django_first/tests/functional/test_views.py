@@ -13,3 +13,10 @@ def test_hello(db, client, data):
     response = html.fromstring(response)
     orders = Order.objects.filter(customer__user__username='kira')
     assert len(response.cssselect('li')) == orders.count()
+
+
+def test_order(db, client, data):
+    response = client.get('/order/1/')
+    assert response.status_code == 200
+    response = response.content.decode('utf-8')
+    assert 'apple' in response
