@@ -7,6 +7,17 @@ from .models import OrderItem
 def order_item_post_save(sender, **kwargs):
     item = kwargs['instance']
     order = item.order
+
+    dublicate = order.items.filter(
+        product=item.product
+    ).exclude(id=item.id).first()
+    if dublicate:
+        dublicate.quantity += item.quantity
+        post_save.disconnect(order_item_post_save, sender=OrderItem)
+        dublicate.save()
+        item.delete()
+        post_save.connect(order_item_post_save, sender=OrderItem)
+
     order.price = sum(
         (item.product.price * item.quantity for item in order.items.all())
     )
