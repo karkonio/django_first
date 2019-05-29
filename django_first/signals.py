@@ -4,7 +4,7 @@ from .models import OrderItem
 
 
 @receiver(post_save, sender=OrderItem)
-def my_handler(sender, **kwargs):
+def order_item_post_save(sender, **kwargs):
     item = kwargs['instance']
     order = item.order
     order.price = sum(

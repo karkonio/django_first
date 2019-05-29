@@ -1,6 +1,6 @@
 import pytest
 
-from django_first.models import Payment, City
+from django_first.models import Payment, City, OrderItem
 
 
 def test_order_process_is_ok(db, data):
@@ -13,6 +13,14 @@ def test_order_process_is_ok(db, data):
     assert store_item.quantity == 90
     assert order.customer.name == 'Kira'
     assert order.customer.user.username == 'kira'
+
+
+def test_order_item_price_signal_ok(db, data):
+    product, store, store_item, order, order_item,\
+        customer, payment, city, location = data
+    assert order.price == 100
+    OrderItem.objects.create(order=order, product=product, quantity=20)
+    assert order.price == 300
 
 
 def test_order_process_ok_mulitple_payments(db, data):
