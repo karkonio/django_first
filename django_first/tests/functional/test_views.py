@@ -21,4 +21,6 @@ def test_order(db, client, data):
     response = client.get(url)
     assert response.status_code == 200
     response = response.content.decode('utf-8')
-    assert 'apple' in response
+    response = html.fromstring(response)
+    items = response.cssselect('.list-group-item')
+    assert items[0].text == 'apple 10'
