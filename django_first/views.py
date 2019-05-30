@@ -1,4 +1,4 @@
-# from django.http import HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render
 
 from .models import Order, OrderItem
@@ -12,13 +12,27 @@ def hello(request):
 
 
 def order(request, order_id):
-    if request.method == 'POST':
-        OrderItem.objects.create(
-            order_id=order_id,
-            product_id=request.POST.get('product_id'),
-            quantity=request.POST.get('quantity')
-        )
     order = Order.objects.get(id=order_id)
+    if request.method == 'POST':
+            product_id = request.POST.get('product')
+            quantity = request.POST.get('quantity')
+            try:
+                quantity = int(quantity)
+            except ValueError:
+                return HttpResponse(
+                    'Quantity must be a positive int',
+                    status=400
+                )
+            if quantity <= 0:
+                return HttpResponse(
+                    'Quantity must be a positive int',
+                    status=400
+                )
+            OrderItem.objects.create(
+                order=order,
+                product_id=product_id,
+                quantity=int(quantity)
+            )
     return render(request, 'order.html', context={
         'order': order
     })

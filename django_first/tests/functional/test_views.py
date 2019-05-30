@@ -1,6 +1,5 @@
 from lxml import html
 
-from django.urls import reverse
 from django_first.models import Order, Product
 
 
@@ -16,25 +15,66 @@ def test_hello(db, client, data):
     assert len(response.cssselect('li')) == orders.count()
 
 
-def test_order(db, client, data):
-    url = reverse('order', args=[1])
-    response = client.get(url)
+def test_order_view(db, client, data):
+    response = client.get('/orders/1/')
     assert response.status_code == 200
     response = response.content.decode('utf-8')
     response = html.fromstring(response)
     items = response.cssselect('.list-group-item')
     assert len(items) == 1
     assert items[0].text == 'apple 10'
+    assert response.cssselect('#product') != []
+    assert response.cssselect('#quantity') != []
 
 
-def test_order_add(db, client, data):
-    url = reverse('order', args=[1])
-    banana = Product.objects.create(name='banana', price=15)
-    response = client.post(url, {'product_id': banana.id, 'quantity': 20})
+def test_order_add_new(db, client, data):
+    banana = Product.objects.create(name='banana', price=20)
+    response = client.post(
+        '/orders/1/',
+        {'product': banana.id, 'quantity': 30}
+    )
     assert response.status_code == 200
     response = response.content.decode('utf-8')
     response = html.fromstring(response)
     items = response.cssselect('.list-group-item')
     assert len(items) == 2
     assert items[0].text == 'apple 10'
-    assert items[1].text == 'banana 20'
+    assert items[1].text == 'banana 30'
+
+
+def test_order_add_same(db, client, data):
+    response = client.post('/orders/1/', {'product': 1, 'quantity': 10})
+    assert response.status_code == 200
+    response = response.content.decode('utf-8')
+    response = html.fromstring(response)
+    items = response.cssselect('.list-group-item')
+    assert len(items) == 1
+    assert items[0].text == 'apple 20'
+
+
+def test_order_add_empty_quantity(db, client, data):
+    response = client.post('/orders/1/', {'product': 1, 'quantity': ''})
+    assert response.status_code == 400
+    response = response.content.decode('utf-8')
+    assert response == 'Quantity must be a positive int'
+
+
+def test_order_add_nonint_quantity(db, client, data):
+    response = client.post('/orders/1/', {'product': 1, 'quantity': 'asd'})
+    assert response.status_code == 400
+    response = response.content.decode('utf-8')
+    assert response == 'Quantity must be a positive int'
+
+
+def test_order_add_zero_quantity(db, client, data):
+    response = client.post('/orders/1/', {'product': 1, 'quantity': 0})
+    assert response.status_code == 400
+    response = response.content.decode('utf-8')
+    assert response == 'Quantity must be a positive int'
+
+
+def test_order_add_negative_quantity(db, client, data):
+    response = client.post('/orders/1/', {'product': 1, 'quantity': -10})
+    assert response.status_code == 400
+    response = response.content.decode('utf-8')
+    assert response == 'Quantity must be a positive int'
