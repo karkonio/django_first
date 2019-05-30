@@ -30,7 +30,7 @@ def test_order(db, client, data):
 def test_order_add(db, client, data):
     url = reverse('order', args=[1])
     banana = Product.objects.create(name='banana', price=15)
-    response = client.get.post(url, {'product_id': banana.id, 'quantity': 20})
+    response = client.post(url, {'product_id': banana.id, 'quantity': 20})
     assert response.status_code == 200
     response = response.content.decode('utf-8')
     response = html.fromstring(response)
