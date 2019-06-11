@@ -85,7 +85,6 @@ class Order(models.Model):
         if paid_amount < self.price:
             raise Exception('Not enough money')
 
-        self.is_paid = True
         self.save()
 
 

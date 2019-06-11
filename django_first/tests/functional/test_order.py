@@ -30,15 +30,16 @@ def test_order_process_ok_mulitple_payments(db, data):
         customer, payment, city, location = data
     payment.amount = 50
     payment.save()
+    assert order.is_paid is False
     Payment.objects.create(
         order=order,
         amount=50,
         is_confirmed=True
     )
+    assert order.is_paid is True
     order.process()
     store_item.refresh_from_db()
     assert order.price == 100
-    assert order.is_paid is True
     assert store_item.quantity == 90
 
 
