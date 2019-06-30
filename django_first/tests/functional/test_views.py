@@ -78,3 +78,17 @@ def test_order_add_negative_quantity(db, client, data):
     assert response.status_code == 400
     response = response.content.decode('utf-8')
     assert response == 'Quantity must be a positive int'
+
+
+def test_order_add_product_doesnt_exist(db, client, data):
+    response = client.post('/orders/1/', {'product': 10, 'quantity': '1'})
+    assert response.status_code == 404
+    response = response.content.decode('utf-8')
+    assert response == 'Product not found'
+
+
+def test_order_add_invalid_product_id(db, client, data):
+    response = client.post('/orders/1/', {'product': 'asd', 'quantity': '1'})
+    assert response.status_code == 400
+    response = response.content.decode('utf-8')
+    assert response == 'Invalid product id'
