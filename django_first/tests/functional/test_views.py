@@ -12,7 +12,9 @@ def test_hello(db, client, data):
     assert 'kira' in response
     response = html.fromstring(response)
     orders = Order.objects.filter(customer__user__username='kira')
-    assert len(response.cssselect('li')) == orders.count()
+    items = response.cssselect('.list-group-item > a')
+    assert len(items) == orders.count()
+    assert items[0].text == '1'
 
 
 def test_order_view(db, client, data):
@@ -27,7 +29,19 @@ def test_order_view(db, client, data):
     assert response.cssselect('#quantity') != []
 
 
-def test_order_add_new(db, client, data):
+def test_order_add(db, client, data):
+    client.login(username='kira', password='testtest')
+    response = client.post('/', {'location': 'Almaty'})
+    assert response.status_code == 200
+    response = response.content.decode('utf-8')
+    response = html.fromstring(response)
+    orders = response.cssselect('.list-group-item > a')
+    assert len(orders) == 2
+    assert orders[0].text == '1'
+    assert orders[1].text == '2'
+
+
+def test_order_add_item_new(db, client, data):
     banana = Product.objects.create(name='banana', price=20)
     response = client.post(
         '/orders/1/',
@@ -52,21 +66,21 @@ def test_order_add_same(db, client, data):
     assert items[0].text == 'apple 20'
 
 
-def test_order_add_empty_quantity(db, client, data):
+def test_order_add_item_empty_quantity(db, client, data):
     response = client.post('/orders/1/', {'product': 1, 'quantity': ''})
     assert response.status_code == 400
     response = response.content.decode('utf-8')
     assert response == 'Quantity must be a positive int'
 
 
-def test_order_add_nonint_quantity(db, client, data):
+def test_order_add__item_nonint_quantity(db, client, data):
     response = client.post('/orders/1/', {'product': 1, 'quantity': 'asd'})
     assert response.status_code == 400
     response = response.content.decode('utf-8')
     assert response == 'Quantity must be a positive int'
 
 
-def test_order_add_zero_quantity(db, client, data):
+def test_order_add_item_zero_quantity(db, client, data):
     response = client.post('/orders/1/', {'product': 1, 'quantity': 0})
     assert response.status_code == 400
     response = response.content.decode('utf-8')

@@ -1,10 +1,19 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from .models import Order, OrderItem, Product
+from .models import Order, OrderItem, Product, Customer
 
 
 def hello(request):
+    if request.method == 'POST':
+        customer = Customer.objects.get(user=request.user)
+        city = request.POST.get('city')
+
+        print(city)
+        Order.objects.create(
+            customer=customer,
+            city_id=int(city)
+        )
     orders = Order.objects.filter(customer__user=request.user)
     return render(request, 'hello.html', context={
         'orders': orders
