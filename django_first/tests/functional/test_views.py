@@ -30,15 +30,18 @@ def test_order_view(db, client, data):
 
 
 def test_order_add(db, client, data):
-    client.login(username='kira', password='testtest')
-    response = client.post('/', {'location': 'Almaty'})
+    banana = Product.objects.create(name='banana', price=20)
+    response = client.post(
+        '/orders/1/',
+        {'product': banana.id, 'quantity': 30}
+    )
     assert response.status_code == 200
     response = response.content.decode('utf-8')
     response = html.fromstring(response)
-    orders = response.cssselect('.list-group-item > a')
-    assert len(orders) == 2
-    assert orders[0].text == '1'
-    assert orders[1].text == '2'
+    items = response.cssselect('.list-group-item')
+    assert len(items) == 2
+    assert items[0].text == 'apple 10'
+    assert items[1].text == 'banana 30'
 
 
 def test_order_add_item_new(db, client, data):
@@ -95,14 +98,14 @@ def test_order_add_negative_quantity(db, client, data):
 
 
 def test_order_add_product_doesnt_exist(db, client, data):
-    response = client.post('/orders/1/', {'product': 10, 'quantity': '1'})
-    assert response.status_code == 404
+    response = client.post('/orders/1/', {'product': 10, 'quantity': 1})
+    assert response.status_code == 400
     response = response.content.decode('utf-8')
-    assert response == 'Product not found'
+    assert response == "Product doesn't exist"
 
 
 def test_order_add_invalid_product_id(db, client, data):
-    response = client.post('/orders/1/', {'product': 'asd', 'quantity': '1'})
+    response = client.post('/orders/1/', {'product': 'asd', 'quantity': 1})
     assert response.status_code == 400
     response = response.content.decode('utf-8')
     assert response == 'Invalid product id'

@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
+
 from .models import Order, OrderItem, Product, Customer
 
 
@@ -12,7 +13,7 @@ def hello(request):
         print(city)
         Order.objects.create(
             customer=customer,
-            city_id=int(city)
+            city_id=city
         )
     orders = Order.objects.filter(customer__user=request.user)
     return render(request, 'hello.html', context={
@@ -35,10 +36,24 @@ def order(request, order_id):
                 product = Product.objects.get(id=product_id)
             except Product.DoesNotExist:
                 return HttpResponse(
-                    'Product not found',
+                    "Product doesn't exist",
                     status=400
                 )
             quantity = request.POST.get('quantity')
+            try:
+                product_id = int(product_id)
+            except ValueError:
+                return HttpResponse(
+                    'Invalid product id',
+                    status=400
+                )
+            try:
+                product = Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                return HttpResponse(
+                    "Product doesn't exist",
+                    status=404
+                )
             try:
                 quantity = int(quantity)
             except ValueError:
