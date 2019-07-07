@@ -25,8 +25,8 @@ def test_order_view(db, client, data):
     items = response.cssselect('.list-group-item')
     assert len(items) == 1
     assert items[0].text == 'apple 10'
-    assert response.cssselect('#product') != []
-    assert response.cssselect('#quantity') != []
+    assert response.cssselect('#id_product') != []
+    assert response.cssselect('#id_quantity') != []
 
 
 def test_order_add(db, client, data):
@@ -99,7 +99,7 @@ def test_order_add_negative_quantity(db, client, data):
 
 def test_order_add_product_doesnt_exist(db, client, data):
     response = client.post('/orders/1/', {'product': 10, 'quantity': 1})
-    assert response.status_code == 400
+    assert response.status_code == 404
     response = response.content.decode('utf-8')
     assert response == "Product doesn't exist"
 

@@ -30,7 +30,7 @@ def order(request, order_id):
                 product = Product.objects.get(id=product_id)
             except Product.DoesNotExist:
                 return HttpResponse(
-                    'Product not found',
+                    "Product doesn't exist",
                     status=404
                 )
             quantity = form.cleaned_data['quantity']
