@@ -6,7 +6,7 @@
 		<li class='list-group-item'>{{ item.product.name }} {{ item.quantity }}</li>
 		{% endfor %}
 	</ul>
-	<form metod='POST'>
+	<form method='POST'>
 	{% csrf_token %}
 	{{ form }}
 	<input type="submit">
