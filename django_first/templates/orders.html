@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+ {% block content %}
+    <ul class="list-group">
+        {% for order in orders %}
+        <li class="list-group-item"><a href="{% url 'order_detail' order.id %}">{{ order.id }}</a></li>
+        {% endfor %}
+    </ul>
+    <form method="POST">
+    {% csrf_token %}
+    <input type="text" id="city" name="city"/>
+    <input type="submit"/>
+    </form>
+{% endblock %} 
