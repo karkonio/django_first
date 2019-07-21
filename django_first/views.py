@@ -20,7 +20,21 @@ def hello(request):
     })
 
 
-def order(request, order_id):
+def order_list(request):
+    if request.method == 'POST':
+        customer = Customer.objects.get(user=request.user)
+        city = request.POST.get('city')
+        Order.objects.create(
+            customer=customer,
+            city_id=city
+        )
+    orders = Order.objects.filter(customer__user=request.user)
+    return render(request, 'hello.html', context={
+        'orders': orders
+    })
+
+
+def order_detail(request, order_id):
     order = Order.objects.get(id=order_id)
     if request.method == 'POST':
         form = OrderItemForm(request.POST)

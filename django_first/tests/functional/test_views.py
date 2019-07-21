@@ -30,18 +30,15 @@ def test_order_view(db, client, data):
 
 
 def test_order_add(db, client, data):
-    banana = Product.objects.create(name='banana', price=20)
-    response = client.post(
-        '/orders/1/',
-        {'product': banana.id, 'quantity': 30}
-    )
+    client.login(username='kira', password='testtest')
+    response = client.post('/orders/', {'city': 1})
     assert response.status_code == 200
     response = response.content.decode('utf-8')
     response = html.fromstring(response)
-    items = response.cssselect('.list-group-item')
+    items = response.cssselect('.list-group-item > a')
     assert len(items) == 2
-    assert items[0].text == 'apple 10'
-    assert items[1].text == 'banana 30'
+    assert items[0].text == '1'
+    assert items[1].text == '2'
 
 
 def test_order_add_item_new(db, client, data):
@@ -109,3 +106,15 @@ def test_order_add_invalid_product_id(db, client, data):
     assert response.status_code == 400
     response = response.content.decode('utf-8')
     assert response == 'Validation error'
+
+
+def test_order_list(db, client, data):
+    client.login(username='kira', password='testtest')
+    response = client.get('/orders/')
+    assert response.status_code == 200
+    response = response.content.decode('utf-8')
+    response = html.fromstring(response)
+    orders = Order.objects.filter(customer__user__username='kira')
+    items = response.cssselect('.list-group-item > a')
+    assert len(items) == orders.count()
+    assert items[0].text == '1'
