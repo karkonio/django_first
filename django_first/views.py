@@ -29,7 +29,7 @@ def order_list(request):
             city_id=city
         )
     orders = Order.objects.filter(customer__user=request.user)
-    return render(request, 'hello.html', context={
+    return render(request, 'orders.html', context={
         'orders': orders
     })
 
