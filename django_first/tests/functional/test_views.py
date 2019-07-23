@@ -3,6 +3,20 @@ from lxml import html
 from django_first.models import Order, Product
 
 
+def test_login(db, client, data):
+    response = client.post(
+        '/login/', {'username': 'kira', 'password': 'testtest'}
+    )
+    assert response.status_code == 302
+
+
+def test_login_fail(db, client, data):
+    response = client.post(
+        '/login/', {'username': 'kira', 'password': 'wrongpassword'}
+    )
+    assert response.status_code == 401
+
+
 def test_hello(db, client, data):
     client.login(username='kira', password='testtest')
     response = client.get('/')
