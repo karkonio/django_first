@@ -7,16 +7,9 @@ from .forms import OrderItemForm
 
 
 def hello(request):
-    if request.method == 'POST':
-        customer = Customer.objects.get(user=request.user)
-        city = request.POST.get('city')
-        Order.objects.create(
-            customer=customer,
-            city_id=city
-        )
-    orders = Order.objects.filter(customer__user=request.user)
+    products = Product.objects.all()
     return render(request, 'hello.html', context={
-        'orders': orders
+        'products': products
     })
 
 
