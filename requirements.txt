@@ -11,7 +11,7 @@ entrypoints==0.3
 fabric==2.4.0
 flake8==3.7.8
 invoke==1.2.0
-lxml==4.3.3
+lxml==4.6.3
 mccabe==0.6.1
 more-itertools==6.0.0
 paramiko==2.6.0
